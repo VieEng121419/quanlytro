@@ -10,9 +10,13 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 
 import moment from 'moment'
 import FileDocumentEditOutline from 'mdi-material-ui/FileDocumentEditOutline'
+import DotsHorizontalCircleOutline from 'mdi-material-ui/DotsHorizontalCircleOutline'
 import { Button } from '@mui/material'
-import ModalDetail from '../modal/Modal-Detail'
+import ModalDetail from '../modal/ModalDetail'
 import { useState } from 'react'
+import ContentWrapper from '../modal/ContentWrapper'
+import LineItem from '../modal/LineItem'
+import CardItem from '../modal/CardItem'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -20,7 +24,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     backgroundColor: '#9155FD'
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
+    fontSize: 14,
+    fontWeight: 600
   }
 }))
 
@@ -35,19 +40,20 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }))
 
-const createData = (name, price, debt, people, date) => {
-  return { name, price, debt, people, date }
+const createData = (id, name, price, debt, people, date) => {
+  return { id, name, price, debt, people, date }
 }
 
 const create37Data = () => {
   return Array.from({ length: 37 }, (_, i) => {
-    const id = `#${i + 1}`
-    const value1 = 159
-    const value2 = 6.0
-    const value3 = 24
+    const id = i
+    const name = `Phòng ${i + 1}`
+    const price = 159
+    const debt = 6.0
+    const people = 24
     const date = moment().format('DD/MM/YYYY')
 
-    return createData(id, value1, value2, value3, date)
+    return createData(id, name, price, debt, people, date)
   })
 }
 
@@ -55,14 +61,15 @@ const rows = create37Data()
 
 const TableCustomized = () => {
   const [open, setOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   return (
     <div>
-      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+      <TableContainer component={Paper} sx={{ maxHeight: '80vh' }}>
         <Table stickyHeader sx={{ minWidth: 700 }} aria-label='customized table'>
           <TableHead>
             <TableRow>
-              <StyledTableCell sx={{ backgroundColor: '#ffffff' }}>Số phòng</StyledTableCell>
+              <StyledTableCell>Phòng</StyledTableCell>
               <StyledTableCell align='right'>Giá thuê</StyledTableCell>
               <StyledTableCell align='right'>Tiền nợ</StyledTableCell>
               <StyledTableCell align='right'>Số người</StyledTableCell>
@@ -85,9 +92,10 @@ const TableCustomized = () => {
                     variant='text'
                     onClick={() => {
                       !open && setOpen(true)
+                      setSelectedItem(row.id)
                     }}
                   >
-                    <FileDocumentEditOutline />
+                    <DotsHorizontalCircleOutline />
                   </Button>
                 </StyledTableCell>
               </StyledTableRow>
@@ -95,7 +103,24 @@ const TableCustomized = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <ModalDetail title="Chi tiết phòng" open={open} onClose={() => setOpen(false)} />
+      <ModalDetail title='Chi tiết phòng' open={open} onClose={() => setOpen(false)}>
+        {/* Thông tin phòng */}
+        <ContentWrapper title='Thông tin phòng'>
+          <>
+            <LineItem contentLeft='Tên phòng' contentRight={rows[selectedItem]?.name} />
+            <LineItem contentLeft='Giá thuê' contentRight={rows[selectedItem]?.price} />
+            <LineItem contentLeft='Tiền nợ' contentRight={rows[selectedItem]?.debt} />
+            <LineItem contentLeft='Số người' contentRight={rows[selectedItem]?.people} />
+            <LineItem contentLeft='Ngày vào' contentRight={rows[selectedItem]?.date} />
+          </>
+        </ContentWrapper>
+        {/* Danh sách khách thuê */}
+        <ContentWrapper title='Danh sách khách thuê'>
+          <>
+            <CardItem />
+          </>
+        </ContentWrapper>
+      </ModalDetail>
     </div>
   )
 }

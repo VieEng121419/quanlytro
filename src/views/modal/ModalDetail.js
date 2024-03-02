@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { Button, Modal as BaseModal, css, Typography } from '@mui/material'
 import React from 'react'
+import ContentWrapper from './ContentWrapper'
 
 const ModalDetail = props => {
   const { open = false, onClose, title = '', children } = props
@@ -21,31 +22,15 @@ const ModalDetail = props => {
         onClose={onClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent sx={{ width: 400 }}>
+        <ModalContent style={{ width: "60%" }}>
           <h2 id='unstyled-modal-title' className='modal-title'>
             {title}
           </h2>
           <p id='unstyled-modal-description' className='modal-description'>
-            {<ContentWrapper title='Thông tin phòng' />}
+            {children}
           </p>
         </ModalContent>
       </Modal>
-    </div>
-  )
-}
-
-const ContentWrapper = props => {
-  const { title, children } = props
-
-  return (
-    <div>
-      <div>
-        <div></div>
-        <Typography variant='subtitle1' gutterBottom>
-          {title}
-        </Typography>
-      </div>
-      {children}
     </div>
   )
 }
