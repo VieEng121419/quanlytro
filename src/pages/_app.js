@@ -52,12 +52,12 @@ const App = props => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
-        <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
+        <title>{`Quản lý ${themeConfig.templateName}`}</title>
+        <meta name='description' content={`Quản lý ${themeConfig.templateName}`} />
         <meta
-          name='description'
-          content={`Quản lý ${themeConfig.templateName}`}
+          name='keywords'
+          content='Quản lý Nhà trọ Tuấn Việt - 201/D, Khu phố 1, phường Hội Nghĩa, thành phố Tân Uyên, Bình Dương'
         />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
 

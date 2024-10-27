@@ -1,35 +1,35 @@
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
-import Link from '@mui/material/Link'
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
+import { Box, Button, Card, Grid, Link, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 
 // ** Demo Components Imports
-import TableBasic from 'src/views/tables/TableBasic'
-import TableDense from 'src/views/tables/TableDense'
-import TableSpanning from 'src/views/tables/TableSpanning'
 import TableCustomized from 'src/views/tables/TableCustomized'
-import TableCollapsible from 'src/views/tables/TableCollapsible'
-import TableStickyHeader from 'src/views/tables/TableStickyHeader'
+import DialogAddRoom from '../../views/dialogs/room/DialogAddRoom'
+import { useState } from 'react'
 
 const MUITable = () => {
+  const [openModalAddRoom, setOpenModalAddRoom] = useState(false)
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <Typography variant='h5'>
-          <Link href='https://mui.com/components/tables/' target='_blank'>
-            Quản lý danh sách phòng
-          </Link>
-        </Typography>
-        <Typography variant='body2'>Tất cả danh sách phòng</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant='h5'>
+            <Link href='https://mui.com/components/tables/' target='_blank'>
+              Danh sách phòng
+            </Link>
+          </Typography>
+          <Button variant='contained' startIcon={<AddIcon />} onClick={() => setOpenModalAddRoom(true)}>
+            Thêm phòng
+          </Button>
+        </Box>
       </Grid>
       <Grid item xs={12}>
         <Card>
-          {/* <CardHeader title='Customized Table' titleTypographyProps={{ variant: 'h6' }} /> */}
           <TableCustomized />
         </Card>
       </Grid>
+      <DialogAddRoom open={openModalAddRoom} setOpen={setOpenModalAddRoom} />
     </Grid>
   )
 }

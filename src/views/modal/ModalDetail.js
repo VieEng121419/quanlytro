@@ -4,7 +4,7 @@ import React from 'react'
 import ContentWrapper from './ContentWrapper'
 
 const ModalDetail = props => {
-  const { open = false, onClose, title = '', children } = props
+  const { open = true, onClose, title = '', children } = props
 
   // const [open, setOpen] = React.useState(false)
   // const handleOpen = () => setOpen(true)
@@ -22,7 +22,7 @@ const ModalDetail = props => {
         onClose={onClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent style={{ width: "60%" }}>
+        <ModalContent style={{ width: '60%' }}>
           <h2 id='unstyled-modal-title' className='modal-title'>
             {title}
           </h2>

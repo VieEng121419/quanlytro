@@ -9,14 +9,13 @@ import TableRow from '@mui/material/TableRow'
 import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 
 import moment from 'moment'
-import FileDocumentEditOutline from 'mdi-material-ui/FileDocumentEditOutline'
-import DotsHorizontalCircleOutline from 'mdi-material-ui/DotsHorizontalCircleOutline'
-import { Button } from '@mui/material'
-import ModalDetail from '../modal/ModalDetail'
-import { useState } from 'react'
-import ContentWrapper from '../modal/ContentWrapper'
-import LineItem from '../modal/LineItem'
-import CardItem from '../modal/CardItem'
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded'
+import { Box, Button, Chip, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import DialogEditRoom from '../dialogs/room/DialogEditRoom'
+import { getRoomWithCustomers } from 'src/firebase/rooms'
+import { formatCurrency } from 'src/utils/helper'
+import { addCustomer } from '../../firebase/customers'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -61,67 +60,105 @@ const rows = create37Data()
 
 const TableCustomized = () => {
   const [open, setOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [roomData, setRoomData] = useState([])
+
+  const handleClickMenu = e => {
+    setOpen(true)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
+  useEffect(() => {
+    const getRooms = async () => {
+      const result = await getRoomWithCustomers()
+      setRoomData(result)
+    }
+
+    const addCustomerTest = async () => {
+      await addCustomer()
+    }
+
+    getRooms()
+    // addCustomerTest()
+  }, [])
+
+  const renderContentRoomInfoCell = row => {
+    const nameCustomerOwner = row?.customers?.find(item => item.isOwner)?.name ?? ''
+
+    return (
+      <StyledTableCell component='th' scope='row'>
+        Phòng {row.roomNumber}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Typography variant='body2' sx={{ color: '#9155FD', fontWeight: '700' }}>
+            {nameCustomerOwner}
+          </Typography>
+        </Box>
+      </StyledTableCell>
+    )
+  }
 
   return (
-    <div>
-      <TableContainer component={Paper} sx={{ maxHeight: '80vh' }}>
-        <Table stickyHeader sx={{ minWidth: 700 }} aria-label='customized table'>
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Phòng</StyledTableCell>
-              <StyledTableCell align='right'>Giá thuê</StyledTableCell>
-              <StyledTableCell align='right'>Tiền nợ</StyledTableCell>
-              <StyledTableCell align='right'>Số người</StyledTableCell>
-              <StyledTableCell align='right'>Ngày vào</StyledTableCell>
-              <StyledTableCell align='right'>Chức năng</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map(row => (
-              <StyledTableRow key={row.name}>
-                <StyledTableCell component='th' scope='row'>
-                  {row.name}
-                </StyledTableCell>
-                <StyledTableCell align='right'>{row.price}</StyledTableCell>
-                <StyledTableCell align='right'>{row.debt}</StyledTableCell>
-                <StyledTableCell align='right'>{row.people}</StyledTableCell>
-                <StyledTableCell align='right'>{row.date}</StyledTableCell>
-                <StyledTableCell align='right'>
-                  <Button
-                    variant='text'
-                    onClick={() => {
-                      !open && setOpen(true)
-                      setSelectedItem(row.id)
-                    }}
-                  >
-                    <DotsHorizontalCircleOutline />
-                  </Button>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ModalDetail title='Chi tiết phòng' open={open} onClose={() => setOpen(false)}>
-        {/* Thông tin phòng */}
-        <ContentWrapper title='Thông tin phòng'>
-          <>
-            <LineItem contentLeft='Tên phòng' contentRight={rows[selectedItem]?.name} />
-            <LineItem contentLeft='Giá thuê' contentRight={rows[selectedItem]?.price} />
-            <LineItem contentLeft='Tiền nợ' contentRight={rows[selectedItem]?.debt} />
-            <LineItem contentLeft='Số người' contentRight={rows[selectedItem]?.people} />
-            <LineItem contentLeft='Ngày vào' contentRight={rows[selectedItem]?.date} />
-          </>
-        </ContentWrapper>
-        {/* Danh sách khách thuê */}
-        <ContentWrapper title='Danh sách khách thuê'>
-          <>
-            <CardItem />
-          </>
-        </ContentWrapper>
-      </ModalDetail>
-    </div>
+    <Box>
+      <Box></Box>
+      <Box>
+        <TableContainer component={Paper} sx={{ maxHeight: '80vh' }}>
+          <Table stickyHeader sx={{ minWidth: 700 }} aria-label='customized table'>
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Phòng</StyledTableCell>
+                <StyledTableCell align='right'>Giá thuê (VND)</StyledTableCell>
+                <StyledTableCell align='right'>Tiền nợ (VND)</StyledTableCell>
+                <StyledTableCell align='right'>Số người</StyledTableCell>
+                <StyledTableCell align='right'>Ngày vào</StyledTableCell>
+                <StyledTableCell align='right'>Trạng thái</StyledTableCell>
+                <StyledTableCell align='right'></StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {roomData.length > 0 &&
+                roomData.map(row => (
+                  <StyledTableRow key={row.name}>
+                    {renderContentRoomInfoCell(row)}
+                    <StyledTableCell align='right'>{formatCurrency(row.price)}</StyledTableCell>
+                    <StyledTableCell align='right'>
+                      {formatCurrency(Number(row.overdueDebt) + Number(row.prevMonthDebt))}
+                    </StyledTableCell>
+                    <StyledTableCell align='right'>{row?.customers?.length ?? 0}</StyledTableCell>
+                    <StyledTableCell align='right'>{row.joinDate}</StyledTableCell>
+                    <StyledTableCell align='right'>
+                      {
+                        <Chip
+                          size='small'
+                          label={row.status ? 'Đang thuê' : 'Trống'}
+                          color={row.status ? 'success' : 'default'}
+                        />
+                      }
+                    </StyledTableCell>
+                    <StyledTableCell align='right'>
+                      <Button
+                        variant='text'
+                        id='basic-button'
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup='true'
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClickMenu}
+                      >
+                        <EditNoteRoundedIcon />
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      <DialogEditRoom open={open} setOpen={setOpen} roomData={roomData} />
+    </Box>
   )
 }
 
